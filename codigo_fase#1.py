@@ -21,7 +21,7 @@ def read_preview(path: Path, n: int = 5) -> pd.DataFrame:
     return pd.read_csv(path, nrows=n)
 
 
-def export_preview_csv(path: Path, output_path: Path, n: int = 5):
+def export_preview_csv(path:    Path, output_path: Path, n: int = 5):
     """Exporta los encabezados y las primeras n filas a un CSV."""
     df = read_preview(path, n)
     df.to_csv(output_path, index=False, encoding="utf-8-sig")
