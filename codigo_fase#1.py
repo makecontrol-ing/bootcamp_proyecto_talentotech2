@@ -2,12 +2,8 @@ from pathlib import Path
 import pandas as pd
 
 
-def find_data_file(folder: Path):
-    patterns = ["*.xlsx", "*.xls", "*.csv"]
-    for pattern in patterns:
-        for path in sorted(folder.glob(pattern)):
-            return path
-    return None
+def find_all_csv_files(folder: Path):
+    return list(folder.glob("**/*.csv"))
 
 
 def read_header(path: Path):
@@ -34,24 +30,26 @@ def export_preview_csv(path: Path, output_path: Path, n: int = 5):
 
 def main():
     folder = Path(__file__).resolve().parent
-    file_path = find_data_file(folder)
+    csv_files = find_all_csv_files(folder)
 
-    if file_path is None:
-        print("No se encontró ningún archivo Excel o CSV en la carpeta.")
+    if not csv_files:
+        print("No se encontraron archivos CSV en la carpeta.")
         return
 
-    print(f"Archivo detectado: {file_path.name}")
-    try:
-        header, shape = read_header(file_path)
-        print(f"Shape: {shape}")
-        print("Encabezado:")
-        for i, column in enumerate(header, start=1):
-            print(f"{i}. {column}")
-        # Exportar preview CSV
-        output_csv = folder / "preview.csv"
-        export_preview_csv(file_path, output_csv)
-    except Exception as exc:
-        print(f"Error al leer el encabezado de {file_path.name}: {exc}")
+    for file_path in csv_files:
+        print(f"\nArchivo detectado: {file_path.name}")
+        try:
+            header, shape = read_header(file_path)
+            print(f"Shape: {shape}")
+            print("Encabezado:")
+            for i, column in enumerate(header, start=1):
+                print(f"{i}. {column}")
+            # Crear nombre de output
+            output_name = f"muestra_{file_path.stem}.csv"
+            output_csv = folder / output_name
+            export_preview_csv(file_path, output_csv)
+        except Exception as exc:
+            print(f"Error al procesar {file_path.name}: {exc}")
 
 
 if __name__ == "__main__":
